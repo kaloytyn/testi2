@@ -73,7 +73,7 @@ make_filename <- function(year) {
         year <- as.integer(year)
         sprintf("accident_%d.csv.bz2", year)
 }
-make_filename(2014)
+make_filename(2013)
 ```
 ## Function to download multiple files.
 
@@ -103,7 +103,7 @@ fars_read_years <- function(years) {
                 })
         })
 }
-fars_read_years(c("2013","2014","2015"))
+fars_read_years(c("2013","2014"))
 ```
 ## Function to summarize multiple years of data.
 
@@ -125,7 +125,7 @@ fars_summarize_years <- function(years) {
                 dplyr::summarize(n = n()) %>%
                 tidyr::spread(year, n)
 }
-fars_summarize_years(c(2013,2014,2015))
+fars_summarize_years(c(2013,2014))
 ```
 ## Function to output a map of road accidents by state.
 
