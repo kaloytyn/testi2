@@ -1,0 +1,164 @@
+---
+title: "Fars Functions Usage"
+author: "KL"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Fars Functions Usage}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(utils)
+library(readr)
+library(dplyr)
+library(tidyr)
+library(maps)
+library(graphics)
+```
+```{r  global_options}
+knitr::opts_chunk$set(eval = TRUE, echo = TRUE, message = TRUE,
+  warning = FALSE)
+utils::globalVariables(c("STATE","MONTH","year"))
+```
+# Accident data visualization codes and data.
+
+This package provides example data and functions to read in and plot accident data for a given year and state in US.
+Raw data files for years 2013, 2014, and 2015 in system.file("extdata", "accident_2013.csv", package = "testi").
+
+## Function to read in data.
+
+This function is given a filename that has both path and name of dataset to download using read_csv function.
+It first checks if the data exist, provides an error message if they do not, and downloads the data
+if they do in a data.frame (or tibble) format. Not that original Coursera code has here been changed to use 
+tibble::as_tibble() instead of dplyr::tbl_df().
+
+Function parameters: filename, a character string giving the path and name of data set to download.
+
+Imported packages are readr, dplyr
+
+Examples: fars_read("accident_2013.csv.bz2")
+
+```{r fars_read}
+fars_read <- function(filename) {
+        if(!file.exists(filename))
+                stop("file '", filename, "' does not exist")
+        data <- suppressMessages({
+                readr::read_csv(filename, progress = FALSE)
+        })
+        tibble::as_tibble(data)
+}
+fars_read("accident_2013.csv.bz2")
+```
+## Function to crate a filename.
+
+This function returns a filename in C-style string formatting from a character or integer year given by the user and a pre set file name. If the year is provided as a character string, the function will convert it to integer before returning the filename.
+
+Parameters:  year, A character string or an integer provided by user that specifies the year of the file name.
+
+Examples:
+ make_filename(2014)
+ make_filename("2014")
+
+```{r make_filename}
+make_filename <- function(year) {
+        year <- as.integer(year)
+        sprintf("accident_%d.csv.bz2", year)
+}
+make_filename(2014)
+```
+## Function to download multiple files.
+
+This function will download one to several years of data on one go from a list of years given by user.
+In case of any error, the function prints warnings of invalid years and returns NULL.
+
+Parameters: years, a vector or list of years given by user that specifies files to download.
+Function returns a list of data frames of specified years.
+
+Imported packages: dplyr, tidyr
+
+Examples:
+ fars_read_years(c("2013","2014","2015"))
+ fars_read_years(c(2013,2014,2015))
+
+```{r fars_read_years}
+fars_read_years <- function(years) {
+        lapply(years, function(year) {
+                file <- make_filename(year)
+                tryCatch({
+                        dat <- fars_read(file)
+                        dplyr::mutate(dat, year = year) %>%
+                                dplyr::select(MONTH, year)
+                }, error = function(e) {
+                        warning("invalid year: ", year)
+                        return(NULL)
+                })
+        })
+}
+fars_read_years(c("2013","2014","2015"))
+```
+## Function to summarize multiple years of data.
+
+This function reads in given years of data and returns a summary of n by years and months.
+
+Parameters: years, a vector or list of years to download and summarize.
+
+Imported packages: dplyr, tidyr
+
+Examples:
+ fars_summarize_years(c("2013","2014","2015"))
+ fars_summarize_years(c(2013,2014,2015))
+
+```{r fars_summarize_years}
+fars_summarize_years <- function(years) {
+        dat_list <- fars_read_years(years)
+        dplyr::bind_rows(dat_list) %>%
+                dplyr::group_by(year, MONTH) %>%
+                dplyr::summarize(n = n()) %>%
+                tidyr::spread(year, n)
+}
+fars_summarize_years(c(2013,2014,2015))
+```
+## Function to output a map of road accidents by state.
+
+This function prints a map of road accidents for a state and year given by users. Function prints "invalid state number" if state number does not exist or there are no accidents.
+
+Parameters: state.num, integer or character; year, integer or character
+
+Imported packages: dplyr, maps, graphics
+
+Examples:
+ fars_map_state(1,"2014")
+ fars_map_state(1,2014)
+
+```{r fars_map_state}
+fars_map_state <- function(state.num, year) {
+        filename <- make_filename(year)
+        data <- fars_read(filename)
+        state.num <- as.integer(state.num)
+
+        if(!(state.num %in% unique(data$STATE)))
+                stop("invalid STATE number: ", state.num)
+        data.sub <- dplyr::filter(data, STATE == state.num)
+        if(nrow(data.sub) == 0L) {
+                message("no accidents to plot")
+                return(invisible(NULL))
+        }
+        is.na(data.sub$LONGITUD) <- data.sub$LONGITUD > 900
+        is.na(data.sub$LATITUDE) <- data.sub$LATITUDE > 90
+        with(data.sub, {
+                maps::map("state", ylim = range(LATITUDE, na.rm = TRUE),
+                          xlim = range(LONGITUD, na.rm = TRUE))
+                graphics::points(LONGITUD, LATITUDE, pch = 46)
+        })
+}
+fars_map_state(1,2014)
+```

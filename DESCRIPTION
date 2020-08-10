@@ -1,0 +1,19 @@
+Package: testi2
+Title: FARS functions to create US road fatality maps by year and state
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "K",
+           family = "L",
+           role = c("aut", "cre"),
+           email = "first.last@example.com",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: Package creates a map of fatal road accidents from a given data and user defined year and state id.
+License: MIT + file LICENSE
+Depends: R (>= 2.10)
+Imports: dplyr (>= 0.8.0), readr, tidyr, maps, graphics, tibble (>= 1.4.2)
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Suggests: knitr, rmarkdown, testthat (>= 2.0.0), utils
+VignetteBuilder: knitr
