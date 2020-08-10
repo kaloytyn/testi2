@@ -17,7 +17,7 @@ You can install the released version of testi2 from
 [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
-#install.packages("testi2")
+install.packages("testi2")
 ```
 
 ## Example
@@ -25,7 +25,7 @@ You can install the released version of testi2 from
 This is a basic example which shows you how to solve a common problem:
 
 ``` r
-#library(testi2)
+library(testi2)
 ## basic example code
 ```
 
