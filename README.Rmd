@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 # testi2
 
 <!-- badges: start -->
-[![Travis build status](https://travis-ci.com/kaloytyn/testi2.svg?branch=master)](https://travis-ci.com/kaloytyn/testi2)
+[![Travis build status](https://travis-ci.org/kaloytyn/testi2.svg?branch=master&status=passed)](https://travis-ci.com/kaloytyn/testi2)
 <!-- badges: end -->
 
 The goal of testi2 is to ...
