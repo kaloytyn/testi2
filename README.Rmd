@@ -26,7 +26,7 @@ The goal of testi2 is to ...
 You can install the released version of testi2 from [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
-install.packages("testi2")
+#install.packages("testi2")
 ```
 
 ## Example
@@ -34,7 +34,7 @@ install.packages("testi2")
 This is a basic example which shows you how to solve a common problem:
 
 ```{r example}
-library(testi2)
+#library(testi2)
 ## basic example code
 ```
 
